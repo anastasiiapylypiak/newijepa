@@ -13,7 +13,7 @@ data:
   use_gaussian_blur: false
   use_horizontal_flip: false
 logging:
-  folder: ./experiment_logs/
+  folder: /p/home/jusers/pylypiak1/jusuf/projects/newijepa/experiment_logs/
   write_tag: jepa
 mask:
   allow_overlap: false
