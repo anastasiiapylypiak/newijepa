@@ -1,9 +1,17 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+# All rights reserved.
+#
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+#
+
 import argparse
+
 import multiprocessing as mp
+
 import pprint
 import yaml
-import os
-import logging
+
 from src.utils.distributed import init_distributed
 from src.train import main as app_main
 
@@ -18,8 +26,10 @@ parser.add_argument(
 
 
 def process_main(rank, fname, world_size, devices):
+    import os
     os.environ['CUDA_VISIBLE_DEVICES'] = str(devices[rank].split(':')[-1])
 
+    import logging
     logging.basicConfig()
     logger = logging.getLogger()
     if rank == 0:
@@ -29,6 +39,7 @@ def process_main(rank, fname, world_size, devices):
 
     logger.info(f'called-params {fname}')
 
+    # -- load script params
     params = None
     with open(fname, 'r') as y_file:
         params = yaml.load(y_file, Loader=yaml.FullLoader)
@@ -47,19 +58,8 @@ if __name__ == '__main__':
     num_gpus = len(args.devices)
     mp.set_start_method('spawn')
 
-    processes = []
     for rank in range(num_gpus):
-        p = mp.Process(
+        mp.Process(
             target=process_main,
             args=(rank, args.fname, num_gpus, args.devices)
-        )
-        p.start()
-        processes.append(p)
-
-    for p in processes:
-        p.join()
-
-    # Print instructions to run scp manually
-    print("Training completed. To download the results, run the following command:")
-    print("scp your_username@remote_server_ip:/path/to/output_results/* /path/to/local_directory/")
-
+        ).start()
