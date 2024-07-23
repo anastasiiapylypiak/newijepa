@@ -13,7 +13,7 @@ def make_inaturalist(
     batch_size,
     collator=None,
     pin_mem=True,
-    num_workers=8,
+    num_workers=6,
     world_size=1,
     rank=0,
     root_path=None,
@@ -45,7 +45,7 @@ def make_inaturalist(
         num_workers=num_workers
     )
     logger.info('iNaturalist data loader created')
-
+    print(f'Number of images in dataset: {len(data_loader.dataset)}')
     return dataset, data_loader, dist_sampler
 
 class INaturalist(torchvision.datasets.ImageFolder):
