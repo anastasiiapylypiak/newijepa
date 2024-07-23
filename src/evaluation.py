@@ -277,7 +277,6 @@ def main(args, max_batches=None):
         yaml.dump(results, f)
 
 if __name__ == "__main__":
-    args = ...
-    main(args)
+    main()
 
 
