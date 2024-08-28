@@ -93,6 +93,7 @@
 
 
 import torch
+import math
 
 def gpu_timer(closure, log_timings=True):
     """ Helper to time gpu-time to execute closure() """
@@ -138,8 +139,34 @@ class CSVLogger(object):
                 end = ',' if i < len(argv) else '\n'
                 print(tv[0] % tv[1], end=end, file=f)
 
+# class AverageMeter(object):
+#     """computes and stores the average and current value"""
+#     def __init__(self):
+#         self.reset()
+#
+#     def reset(self):
+#         self.val = 0
+#         self.avg = 0
+#         self.max = float('-inf')
+#         self.min = float('inf')
+#         self.sum = 0
+#         self.count = 0
+#
+#     def update(self, val, n=1):
+#         self.val = val
+#         try:
+#             self.max = max(val, self.max)
+#             self.min = min(val, self.min)
+#         except Exception:
+#             pass
+#         self.sum += val * n
+#         self.count += n
+#         self.avg = self.sum / self.count
+
+
 class AverageMeter(object):
-    """computes and stores the average and current value"""
+    """computes and stores the average, current value, min, max, and standard deviation"""
+
     def __init__(self):
         self.reset()
 
@@ -150,6 +177,8 @@ class AverageMeter(object):
         self.min = float('inf')
         self.sum = 0
         self.count = 0
+        self.sum_of_squares = 0  # To store the sum of squares for std calculation
+        self.std = 0
 
     def update(self, val, n=1):
         self.val = val
@@ -161,6 +190,20 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
+
+        # Update the sum of squares
+        self.sum_of_squares += n * (val ** 2)
+
+        # Calculate variance (using Welford's method for numerical stability)
+        if self.count > 1:
+            mean_of_squares = self.sum_of_squares / self.count
+            square_of_mean = self.avg ** 2
+            variance = mean_of_squares - square_of_mean
+            self.std = math.sqrt(variance)
+
+    def __str__(self):
+        return f'Avg: {self.avg:.4f}, Std: {self.std:.4f}, Min: {self.min}, Max: {self.max}, Count: {self.count}'
+
 
 def grad_logger(named_params):
     stats = AverageMeter()

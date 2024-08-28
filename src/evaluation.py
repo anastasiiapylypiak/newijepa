@@ -186,7 +186,7 @@ def main(args, max_batches=None):
     with torch.no_grad():  # Ensure entire evaluation loop is within no_grad context
         for itr, (udata, masks_enc, masks_pred) in enumerate(unsupervised_loader):
 
-            if iteration_count >= 10:  # Stop after 10 iterations
+            if iteration_count >= 20:  # Stop after 10 iterations
                 break
 
             def load_imgs():
@@ -252,14 +252,14 @@ def main(args, max_batches=None):
             def log_stats():
                 csv_logger.log(1, itr, loss, maskA_meter.val, maskB_meter.val, etime)
                 if (itr % log_freq == 0) or np.isnan(loss) or np.isinf(loss):
-                    logger.info('[%d, %5d] loss: %.3f '
-                                'masks: %.1f %.1f '
+                    logger.info('[%d, %5d] loss: %.3f (std: %.3f) '
+                                'masks: %.1f (std: %.1f) %.1f (std: %.1f) '
                                 '[mem: %.2e] '
                                 '(%.1f ms)'
                                 % (1, itr,
-                                   loss_meter.avg,
-                                   maskA_meter.avg,
-                                   maskB_meter.avg,
+                                   loss_meter.avg, loss_meter.std,
+                                   maskA_meter.avg, maskA_meter.std,
+                                   maskB_meter.avg, maskB_meter.std,
                                    torch.cuda.max_memory_allocated() / 1024. ** 2,
                                    time_meter.avg))
 
