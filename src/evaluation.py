@@ -269,8 +269,6 @@ def main(args, max_batches=None):
 
             iteration_count += 1
 
-    unsupervised_loader = None
-
     # Save results to file
     results_file = os.path.join(folder, 'evaluation_results.yaml')
     with open(results_file, 'w') as f:

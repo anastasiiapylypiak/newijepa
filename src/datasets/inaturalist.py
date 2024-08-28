@@ -1,7 +1,6 @@
 import os
 import subprocess
 import time
-import numpy as np
 from logging import getLogger
 import torch
 import torchvision
